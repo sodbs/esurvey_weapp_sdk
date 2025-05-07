@@ -91,14 +91,12 @@
     </view>
   </view>
 
-  <!-- 空状态展示 -->
   <view class="empty-state" wx:if="{{!deviceInfo}}">
     <text>请先获取SDK Token，然后点击"搜索蓝牙设备"连接易测终端</text>
   </view>
 
 </view>
 
-<!-- 蓝牙组件 -->
 <esurvey id="esurveyComponent"
   longitude="{{longitude}}"
   latitude="{{latitude}}"
