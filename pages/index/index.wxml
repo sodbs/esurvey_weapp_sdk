@@ -1,27 +1,117 @@
-<!--index.wxml-->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+<view class="container">
+  <view class="header">
+    <text class="title">易测终端连接示例</text>
+  </view>
+
+  <!-- SDK Token获取区域 -->
+  <view class="token-area">
+    <button class="token-btn" bindtap="getSdkToken" disabled="{{hasSdkToken}}">获取SDK Token</button>
+    <view class="token-status" wx:if="{{hasSdkToken}}">
+      <view class="dot connected"></view>
+      <text class="status-text">Token已获取</text>
     </view>
   </view>
-</scroll-view>
+
+  <!-- 蓝牙操作区域 -->
+  <view class="actions">
+    <button class="scan-btn" bindtap="startBluetoothScan" disabled="{{!hasSdkToken || deviceInfo}}">搜索蓝牙设备</button>
+    <button class="disconnect-btn" bindtap="disconnectBluetooth" disabled="{{!deviceInfo}}">断开连接</button>
+  </view>
+
+  <!-- 设备状态展示 -->
+  <view class="device-status" wx:if="{{deviceInfo}}">
+    <view class="status-header">
+      <text class="status-title">设备信息</text>
+      <view class="status-indicator">
+        <view class="dot connected"></view>
+        <text class="status-text">已连接</text>
+      </view>
+    </view>
+
+    <view class="device-info-list">
+      <view class="device-info-row">
+        <text class="label">设备名称:</text>
+        <text class="value">{{deviceInfo.bluetoothName}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">设备ID:</text>
+        <text class="value">{{deviceInfo.deviceId}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">型号:</text>
+        <text class="value">{{deviceInfo.deviceType}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">版本:</text>
+        <text class="value">{{deviceInfo.version}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">激活状态:</text>
+        <text class="value">{{deviceInfo.isActive ? '已激活' : '未激活'}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">认证状态:</text>
+        <text class="value">{{deviceAuthenticated ? '已认证' : '未认证'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 位置信息展示 -->
+  <view class="location-info" wx:if="{{locationData}}">
+    <view class="status-header">
+      <text class="status-title">位置信息</text>
+      <view class="status-indicator">
+        <view class="dot {{locationData.locationStat > 0 ? 'connected' : 'disconnected'}}"></view>
+        <text class="status-text">{{locationData.locationStatusShow}}</text>
+      </view>
+    </view>
+
+    <view class="device-info-list">
+      <view class="device-info-row">
+        <text class="label">经纬度:</text>
+        <text class="value">{{locationData.locationShow}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">高度:</text>
+        <text class="value">{{locationData.height}} 米</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">卫星数量:</text>
+        <text class="value">{{locationData.satelliteNum}}</text>
+        <text class="warning" wx:if="{{locationData.satelliteNum === 0}}">请将天线放置开阔地区</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">精度:</text>
+        <text class="value">{{locationData.xInaccuracies >= 0 ? locationData.xInaccuracies + 'm' : '未知'}}</text>
+      </view>
+        <view class="device-info-row">
+        <text class="label">来源:</text>
+        <text class="value">{{locationData && locationData.networkDiffSync ? '蜂窝' : 'FM'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态展示 -->
+  <view class="empty-state" wx:if="{{!deviceInfo}}">
+    <text>请先获取SDK Token，然后点击"搜索蓝牙设备"连接易测终端</text>
+  </view>
+
+</view>
+
+<!-- 蓝牙组件 -->
+<esurvey id="esurveyComponent"
+  longitude="{{longitude}}"
+  latitude="{{latitude}}"
+  radio="{{radio}}"
+  sdkToken="{{sdkToken}}"
+  key="{{key}}"
+  hostAppId="{{hostAppId}}"
+  bind:connectSuccess="onConnectSuccess"
+  bind:deviceStatusChange="onDeviceStatusChange"
+  bind:disconnect="onDisconnect"
+  bind:connectFail="onConnectFail"
+  bind:locationUpdate="onLocationUpdate"
+  bind:authenticationResult="onAuthenticationResult"
+/>
+
+<hello-list id="helloList"></hello-list>
