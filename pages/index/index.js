@@ -1,7 +1,7 @@
 // 定义常量
 const API_BASE_URL = 'https://www.sobds.com'
-const API_KEY = '填入自己申请的API_KEY'
-const API_SECRET = '填入自己申请的API_SECRET'
+const API_KEY = ''
+const API_SECRET = ''
 
 Page({
   data: {
@@ -91,6 +91,7 @@ Page({
   },
 
   // 获取SDK Token
+  // sdkToken 应该放在服务端获取
   getSdkToken() {
     // 先检查是否有位置信息
     if (!this.data.longitude || !this.data.latitude) {
@@ -123,12 +124,11 @@ Page({
     // 先获取AppToken
     this.getAppToken()
       .then(appToken => {
-
-        // 请注意hostAppId 
+        // 生成hostAppId - 使用毫秒时间戳
+        // 注意这里应该是你们app对应的用户Id, demo使用毫秒值代替
         const hostAppId = Date.now().toString();
         this.setData({ hostAppId });
 
-        // 模拟用户ID
         
         // 使用AppToken获取SDK Token
         return new Promise((resolve, reject) => {
@@ -196,13 +196,6 @@ Page({
       });
   },
 
-  addItem() {
-    this.data.items.push(this.data.currentItem++)
-    this.setData({
-      items: this.data.items,
-      currentItem: this.data.currentItem
-    })
-  },
 
   // 获取esurvey组件实例
   getEsurveyComponent() {
@@ -243,18 +236,6 @@ Page({
     }
   },
 
-  // 发送数据到蓝牙设备
-  sendDataToBluetooth(data) {
-    const esurveyComponent = this.getEsurveyComponent();
-    if (esurveyComponent && esurveyComponent.isConnected()) {
-      esurveyComponent.sendDataToBluetooth(data);
-    } else {
-      wx.showToast({
-        title: '设备未连接',
-        icon: 'none'
-      });
-    }
-  },
 
   // 连接成功回调
   onConnectSuccess(e) {
@@ -312,6 +293,7 @@ Page({
 
   // 位置数据更新回调
   onLocationUpdate(e) {
+    console.log('位置数据更新', e.detail);
     this.setData({
       locationData: e.detail
     });

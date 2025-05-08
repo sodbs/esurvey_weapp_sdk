@@ -72,7 +72,7 @@
         <text class="value">{{locationData.locationShow}}</text>
       </view>
       <view class="device-info-row">
-        <text class="label">高度:</text>
+        <text class="label">高程:</text>
         <text class="value">{{locationData.height}} 米</text>
       </view>
       <view class="device-info-row">
@@ -81,8 +81,16 @@
         <text class="warning" wx:if="{{locationData.satelliteNum === 0}}">请将天线放置开阔地区</text>
       </view>
       <view class="device-info-row">
-        <text class="label">精度:</text>
+        <text class="label">平面精度:</text>
         <text class="value">{{locationData.xInaccuracies >= 0 ? locationData.xInaccuracies + 'm' : '未知'}}</text>
+      </view>
+      <view class="device-info-row">
+        <text class="label">高程精度:</text>
+        <text class="value">{{locationData.yInaccuracies >= 0 ? locationData.yInaccuracies + 'm' : '未知'}}</text>
+      </view>
+        <view class="device-info-row">
+        <text class="label">pdop:</text>
+        <text class="value">{{locationData.pdop >= 0 ? locationData.pdop  : '未知'}}</text>
       </view>
         <view class="device-info-row">
         <text class="label">来源:</text>
@@ -91,12 +99,14 @@
     </view>
   </view>
 
+  <!-- 空状态展示 -->
   <view class="empty-state" wx:if="{{!deviceInfo}}">
     <text>请先获取SDK Token，然后点击"搜索蓝牙设备"连接易测终端</text>
   </view>
 
 </view>
 
+<!-- 蓝牙组件 -->
 <esurvey id="esurveyComponent"
   longitude="{{longitude}}"
   latitude="{{latitude}}"
@@ -111,5 +121,3 @@
   bind:locationUpdate="onLocationUpdate"
   bind:authenticationResult="onAuthenticationResult"
 />
-
-<hello-list id="helloList"></hello-list>
